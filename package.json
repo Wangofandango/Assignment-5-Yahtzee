@@ -1,7 +1,15 @@
 {
   "name": "yahtzee",
   "version": "1.0.0",
-  "workspaces": ["client", "server", "pubsub"],
+  "workspaces": [
+    "client",
+    "server",
+    "pubsub"
+  ],
   "author": "Ole I Hougaard",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
 }
