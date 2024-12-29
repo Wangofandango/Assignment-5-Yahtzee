@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import * as api from '../model/api'; // Adjust the import path as needed
-import { fetchPendingGame } from '../redux/pendingGamesSlice'; // Adjust the import path as needed
-import { fetchOngoingGame } from '../redux/ongoingGamesSlice'; // Adjust the import path as needed
+import * as api from '../model/api';
+import { fetchPendingGame } from '../redux/pendingGamesSlice';
+import { fetchOngoingGame } from '../redux/ongoingGamesSlice';
 
 const Pending = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const player = useSelector((state) => state.player.player);
   const pendingGame = useSelector((state) => state.pendingGames.games[id]);
@@ -21,19 +21,19 @@ const Pending = () => {
 
   useEffect(() => {
     if (player === undefined) {
-      history.push('/login');
+      navigate('/login');
     } else {
       dispatch(fetchPendingGame(gameId));
     }
-  }, [player, gameId, history, dispatch]);
+  }, [player, gameId, navigate, dispatch]);
 
   useEffect(() => {
     if (!pendingGame && ongoingGame) {
-      history.replace(`/game/${gameId}`);
+      navigate(`/game/${gameId}`);
     } else if (!pendingGame && !ongoingGame) {
-      history.replace('/');
+      navigate('/');
     }
-  }, [pendingGame, ongoingGame, gameId, history]);
+  }, [pendingGame, ongoingGame, gameId, navigate]);
 
   const canJoin = useMemo(() => {
     return pendingGame && player && !pendingGame.players.includes(player);

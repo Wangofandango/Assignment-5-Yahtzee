@@ -1,40 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setPlayer } from '../redux/playerSlice'; // Adjust the import path as needed
+import { setPlayer } from '../redux/playerSlice'; // Ensure this file exists
 
 const Login = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const [player, setPlayerName] = useState('');
   const enabled = player !== '';
 
-  const login = () => {
+  const login = React.useCallback(() => {
     dispatch(setPlayer(player));
     const query = new URLSearchParams(location.search);
     if (query.get('game')) {
-      history.replace(`/game/${query.get('game')}`);
+      navigate(`/game/${query.get('game')}`);
     } else if (query.get('pending')) {
-      history.replace(`/pending/${query.get('pending')}`);
+      navigate(`/pending/${query.get('pending')}`);
     } else {
-      history.replace('/');
+      navigate('/');
     }
-  };
+  }, [dispatch, player, location.search, navigate]);
 
-  const loginKeyListener = (e) => {
+  const loginKeyListener = React.useCallback((e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (enabled) login();
     }
-  };
+  }, [enabled, login]);
 
   useEffect(() => {
     window.addEventListener('keypress', loginKeyListener);
     return () => {
       window.removeEventListener('keypress', loginKeyListener);
     };
-  }, [enabled]);
+  }, [loginKeyListener]);
 
   return (
     <div>

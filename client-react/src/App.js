@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Lobby from './views/Lobby';
-import Login from './views/Login';
-import Game from './views/Game';
-import Pending from './views/Pending';
-import { fetchGames, fetchPendingGames, upsertOngoingGame, upsertPendingGame, removePendingGame } from './redux/actions'; // Adjust the import paths as needed
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import Lobby from "./views/Lobby";
+import Login from "./views/Login";
+import Game from "./views/Game";
+import Pending from "./views/Pending";
+import {
+  fetchGames,
+  fetchPendingGames,
+  upsertOngoingGame,
+  upsertPendingGame,
+  removePendingGame,
+} from "./redux/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -14,10 +20,6 @@ const App = () => {
   const pendingGames = useSelector((state) => state.pendingGames.games);
 
   const isParticipant = (game) => game.players.includes(player ?? "");
-
-  const myOngoingGames = ongoingGames.filter((g) => isParticipant(g) && !g.is_finished);
-  const myPendingGames = pendingGames.filter(isParticipant);
-  const otherPendingGames = pendingGames.filter((g) => !isParticipant(g));
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:9090/publish");
@@ -48,14 +50,51 @@ const App = () => {
     fetchData();
   }, [dispatch]);
 
+  const myOngoingGames = ongoingGames.filter(isParticipant);
+  const myPendingGames = pendingGames.filter(isParticipant);
+  const otherPendingGames = pendingGames.filter((game) => !isParticipant(game));
+
   return (
     <Router>
-      <Switch>
-        <Route exact path="/" component={Lobby} />
-        <Route path="/login" component={Login} />
-        <Route path="/game/:id" component={Game} />
-        <Route path="/pending/:id" component={Pending} />
-      </Switch>
+      <div>
+        <h1 className="header">Yahtzee!</h1>
+        {player && <h2 className="subheader">Welcome player {player}</h2>}
+        {player && (
+          <nav>
+            <Link className="link" to="/">
+              Lobby
+            </Link>
+
+            <h2>My Games</h2>
+            <h3>Ongoing</h3>
+            {myOngoingGames.map((game) => (
+              <Link key={game.id} className="link" to={`/game/${game.id}`}>
+                Game #{game.id}
+              </Link>
+            ))}
+
+            <h3>Waiting for players</h3>
+            {myPendingGames.map((game) => (
+              <Link key={game.id} className="link" to={`/pending/${game.id}`}>
+                Game #{game.id}
+              </Link>
+            ))}
+
+            <h2>Available Games</h2>
+            {otherPendingGames.map((game) => (
+              <Link key={game.id} className="link" to={`/pending/${game.id}`}>
+                Game #{game.id}
+              </Link>
+            ))}
+          </nav>
+        )}
+        <Routes>
+          <Route path="/" element={<Lobby />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/game/:id" element={<Game />} />
+          <Route path="/pending/:id" element={<Pending />} />
+        </Routes>
+      </div>
     </Router>
   );
 };

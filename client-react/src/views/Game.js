@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { is_finished, scores } from 'models/src/model/yahtzee.game';
-import { fetchOngoingGame } from '../redux/ongoingGamesSlice'; // Adjust the import path as needed
+import { is_finished, scores } from 'models/src/model/yahtzee.game';  
+import { fetchOngoingGame } from '../redux/ongoingGamesSlice';
 
 const Game = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const player = useSelector((state) => state.player.player);
   const game = useSelector((state) => state.ongoingGames.games[id]);
@@ -19,11 +19,11 @@ const Game = () => {
 
   useEffect(() => {
     if (player === undefined) {
-      history.push(`/login?game=${gameId}`);
+      navigate(`/login?game=${gameId}`);
     } else if (game === undefined) {
       dispatch(fetchOngoingGame(gameId));
     }
-  }, [player, game, gameId, history, dispatch]);
+  }, [player, game, gameId, navigate, dispatch]);
 
   const enabled = useMemo(() => {
     return game !== undefined && player === game.players[game.playerInTurn];

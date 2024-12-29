@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import * as api from '../model/api'; // Adjust the import path as needed
+import * as api from '../model/api'; // Ensure this file exists
 
 const Lobby = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const player = useSelector((state) => state.player.player);
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
 
   useEffect(() => {
     if (player === undefined) {
-      history.push('/login');
+      navigate('/login');
     }
-  }, [player, history]);
+  }, [player, navigate]);
 
   const newGame = async () => {
     const pendingGame = await api.new_game(numberOfPlayers, player);
-    setTimeout(() => history.push(`/pending/${pendingGame.id}`), 100);
+    setTimeout(() => navigate(`/pending/${pendingGame.id}`), 100);
   };
 
   if (player === undefined) {
